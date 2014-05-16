@@ -1,18 +1,17 @@
 task getSingingProperties() {
-    File signingFile = file("$projectDir/../signing.properties")
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    //def storeFile = properties.getProperty('storeFile')
 
-    if (signingFile.exists()) {
-        project.ext.signingProperties.load(new FileInputStream(signingFile))
+    //File signingFile = file("$projectDir/../signing.properties")
+    
+    project.ext.signingProperties.load(new FileInputStream(signingFile))
 
-        if (project.ext.signingProperties.containsKey('storeFile') && file(project.ext.signingProperties.storeFile).exists()) {
-            project.ext.signingProperties.isUseSigningConfig = true;
-        } else {
-            project.ext.signingProperties.isUseSigningConfig = false;
-        }
+    if (project.ext.signingProperties.containsKey('storeFile') && file(project.ext.signingProperties.storeFile).exists()) {
+        project.ext.signingProperties.isUseSigningConfig = true;
     } else {
         project.ext.signingProperties.isUseSigningConfig = false;
     }
-
+   
     if (project.ext.signingProperties.isUseSigningConfig) {
         println project.ext.signingProperties.keystore + " - " + project.ext.signingProperties.key
     } else {

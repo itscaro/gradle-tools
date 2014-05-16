@@ -2,19 +2,19 @@ task getSingingProperties() {
     File signingFile = file("$projectDir/../signing.properties")
 
     if (signingFile.exists()) {
-        ext.signingProperties.load(new FileInputStream(signingFile))
+        project.ext.signingProperties.load(new FileInputStream(signingFile))
 
-        if (ext.signingProperties.containsKey('storeFile') && file(ext.signingProperties.storeFile).exists()) {
-            ext.signingProperties.isUseSigningConfig = true;
+        if (project.ext.signingProperties.containsKey('storeFile') && file(project.ext.signingProperties.storeFile).exists()) {
+            project.ext.signingProperties.isUseSigningConfig = true;
         } else {
-            ext.signingProperties.isUseSigningConfig = false;
+            project.ext.signingProperties.isUseSigningConfig = false;
         }
     } else {
-        ext.signingProperties.isUseSigningConfig = false;
+        project.ext.signingProperties.isUseSigningConfig = false;
     }
 
-    if (ext.signingProperties.isUseSigningConfig) {
-        println ext.signingProperties.keystore + " - " + ext.signingProperties.key
+    if (project.ext.signingProperties.isUseSigningConfig) {
+        println project.ext.signingProperties.keystore + " - " + project.ext.signingProperties.key
     } else {
         println "No signing"
     }

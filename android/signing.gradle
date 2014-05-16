@@ -1,20 +1,20 @@
 task getSingingProperties() {
-    File signingFile = new File("$projectDir/../signing.properties")
+    File signingFile = file("$projectDir/../signing.properties")
 
     if (signingFile.exists()) {
-        props.load(new FileInputStream(signingFile))
+        ext.signingProperties.load(new FileInputStream(signingFile))
 
-        if (props.containsKey('keystore') && file(props.keystore).exists()) {
-            props.isUseSigningConfig = true;
+        if (ext.signingProperties.containsKey('storeFile') && file(ext.signingProperties.storeFile).exists()) {
+            ext.signingProperties.isUseSigningConfig = true;
         } else {
-            props.isUseSigningConfig = false;
+            ext.signingProperties.isUseSigningConfig = false;
         }
     } else {
-        props.isUseSigningConfig = false;
+        ext.signingProperties.isUseSigningConfig = false;
     }
 
-    if (props.isUseSigningConfig) {
-        println props.keystore + " - " + props.key
+    if (ext.signingProperties.isUseSigningConfig) {
+        println ext.signingProperties.keystore + " - " + ext.signingProperties.key
     } else {
         println "No signing"
     }

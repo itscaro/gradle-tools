@@ -1,0 +1,25 @@
+task getSingingProperties() {
+    File signingFile = new File("$projectDir/../signing.properties")
+
+    if (signingFile.exists()) {
+        props.load(new FileInputStream(signingFile))
+
+        if (props.containsKey('keystore') && file(props.keystore).exists()) {
+            props.isUseSigningConfig = true;
+        } else {
+            props.isUseSigningConfig = false;
+        }
+    } else {
+        props.isUseSigningConfig = false;
+    }
+
+    if (props.isUseSigningConfig) {
+        println props.keystore + " - " + props.key
+    } else {
+        println "No signing"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn('getSingingProperties')
+}

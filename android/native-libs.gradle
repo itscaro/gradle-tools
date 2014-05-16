@@ -1,0 +1,14 @@
+task nativeLibsToJar(type: Zip) {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'lib/'
+}
+
+tasks.withType(JavaCompile) {
+    compileTask ->
+        compileTask.dependsOn('nativeLibsToJar')
+        println("Compiling native libs")
+}
+

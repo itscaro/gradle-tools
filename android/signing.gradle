@@ -1,24 +1,60 @@
-task getSingingProperties() {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    //def storeFile = properties.getProperty('storeFile')
+apply plugin: 'android'
 
-    //File signingFile = file("$projectDir/../signing.properties")
-    
-    project.ext.signingProperties.load(new FileInputStream(signingFile))
+apply from: 'https://raw.githubusercontent.com/itscaro/gradle-tools/master/android/native-libs.gradle'
 
-    if (project.ext.signingProperties.containsKey('storeFile') && file(project.ext.signingProperties.storeFile).exists()) {
-        project.ext.signingProperties.isUseSigningConfig = true;
-    } else {
-        project.ext.signingProperties.isUseSigningConfig = false;
+Properties localProperties = new Properties()
+localProperties.load(new FileInputStream("$rootDir/local.properties"))
+
+if (localProperties.storeFile && localProperties.keyAlias) {
+    println "Signing with " + localProperties.storeFile + " - " + localProperties.keyAlias
+} else {
+    println "No signing"
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.3'
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 19
+        versionCode System.getenv("BUILD_NUMBER") as Integer ?: 0
+        versionName "0.0.0"
     }
-   
-    if (project.ext.signingProperties.isUseSigningConfig) {
-        println project.ext.signingProperties.keystore + " - " + project.ext.signingProperties.key
-    } else {
-        println "No signing"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    signingConfigs {
+        release {
+            if (localProperties.storeFile && localProperties.keyAlias) {
+                storeFile file(localProperties.storeFile)
+                storePassword localProperties.storePassword
+                keyAlias localProperties.keyAlias
+                keyPassword localProperties.keyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (localProperties.storeFile && localProperties.keyAlias) {
+                signingConfig signingConfigs.release
+            }
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable false
+            zipAlign true
+        }
+        debug {
+            debuggable true
+            runProguard false
+            zipAlign false
+        }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn('getSingingProperties')
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }
